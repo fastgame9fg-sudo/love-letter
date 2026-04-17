@@ -6,14 +6,14 @@ const IMG = (name) => `assets/cards/${name}.png`;
 
 export const CARD_DEFS = {
   // Classic cards (1..8)
-  guard:     { id: 'guard',     value: 1, name: 'Garde',     icon: '⚔️',  img: IMG('guard'),     desc: "Nomme un type (non-Garde). Si l'adversaire l'a, il est éliminé." },
-  priest:    { id: 'priest',    value: 2, name: 'Prêtre',    icon: '🕯️',  img: IMG('priest'),    desc: "Regarde en secret la main d'un adversaire." },
-  baron:     { id: 'baron',     value: 3, name: 'Baron',     icon: '⚖️',  img: IMG('baron'),     desc: "Compare en secret avec un adversaire. Le plus faible est éliminé." },
-  handmaid:  { id: 'handmaid',  value: 4, name: 'Servante',  icon: '🛡️',  img: IMG('handmaid'),  desc: "Tu es protégé jusqu'à ton prochain tour." },
-  prince:    { id: 'prince',    value: 5, name: 'Prince',    icon: '👑',  img: IMG('prince'),    desc: "Un joueur (toi inclus) défausse sa main et en pioche une nouvelle." },
-  king:      { id: 'king',      value: 6, name: 'Roi',       icon: '🤴',  img: IMG('king'),      desc: "Échange ta main avec celle d'un adversaire." },
-  countess:  { id: 'countess',  value: 7, name: 'Comtesse',  icon: '👸',  img: IMG('countess'),  desc: "Doit être défaussée si tu as aussi le Roi ou le Prince." },
-  princess:  { id: 'princess',  value: 8, name: 'Princesse', icon: '💖',  img: IMG('princess'),  desc: "Si tu la défausses, tu es éliminé." },
+  guard:     { id: 'guard',     value: 1, name: 'Garde',     darijaName: 'الڭارديان',      icon: '⚔️',  img: IMG('guard'),     desc: "Nomme un type (non-Garde). Si l'adversaire l'a, il est éliminé." },
+  priest:    { id: 'priest',    value: 2, name: 'Prêtre',    darijaName: 'الجارة',          icon: '🕯️',  img: IMG('priest'),    desc: "Regarde en secret la main d'un adversaire." },
+  baron:     { id: 'baron',     value: 3, name: 'Baron',     darijaName: 'المسطي',          icon: '⚖️',  img: IMG('baron'),     desc: "Compare en secret avec un adversaire. Le plus faible est éliminé." },
+  handmaid:  { id: 'handmaid',  value: 4, name: 'Servante',  darijaName: 'البلغة الضايعة',  icon: '🛡️',  img: IMG('handmaid'),  desc: "Tu es protégé jusqu'à ton prochain tour." },
+  prince:    { id: 'prince',    value: 5, name: 'Prince',    darijaName: 'المخازني',        icon: '👑',  img: IMG('prince'),    desc: "Un joueur (toi inclus) défausse sa main et en pioche une nouvelle." },
+  king:      { id: 'king',      value: 6, name: 'Roi',       darijaName: 'العڭوزة',         icon: '🤴',  img: IMG('king'),      desc: "Échange ta main avec celle d'un adversaire." },
+  countess:  { id: 'countess',  value: 7, name: 'Comtesse',  darijaName: 'القايد',          icon: '👸',  img: IMG('countess'),  desc: "Doit être défaussée si tu as aussi le Roi ou le Prince." },
+  princess:  { id: 'princess',  value: 8, name: 'Princesse', darijaName: 'للاّ',             icon: '💖',  img: IMG('princess'),  desc: "Si tu la défausses, tu es éliminé." },
 
   // Premium-only cards
   spy:       { id: 'spy',       value: 0, name: 'Espionne',  icon: '🕵️',  img: IMG('spy'),       desc: "En fin de manche, si tu es seul à avoir joué au moins une Espionne, tu gagnes 1 jeton." },
@@ -27,6 +27,13 @@ export const CARD_DEFS = {
   queen:     { id: 'queen',     value: 7, name: 'Reine-mère',icon: '👵',  desc: "Compare ta main avec un adversaire. Le PLUS FORT est éliminé." },
   bishop:    { id: 'bishop',    value: 9, name: 'Évêque',    icon: '⛪',  desc: "Devine la carte d'un adversaire. Correct = 1 jeton (il peut se défausser)." },
 };
+
+// Resolve the display name based on mode.
+// In Classic/Extended modes, show the Darija name when available; Premium keeps French.
+export function cardName(card, mode) {
+  if ((mode === 'classic' || mode === 'extended') && card.darijaName) return card.darijaName;
+  return card.name;
+}
 
 // Mode deck compositions
 export const DECKS = {

@@ -1,6 +1,6 @@
 // UI controller. Wires the DOM to the Game engine.
 import { Game } from './game.js';
-import { CARD_DEFS, DECKS } from './cards.js';
+import { CARD_DEFS, DECKS, cardName } from './cards.js';
 import { aiChooseIntent, aiBishopAccept } from './ai.js';
 
 const $ = (sel) => document.querySelector(sel);
@@ -301,7 +301,7 @@ function renderOpponents() {
     });
     const disc = document.createElement('div'); disc.className = 'opp-discard';
     p.discard.slice(-6).forEach(c => {
-      const m = document.createElement('div'); m.className = 'mini-card'; m.textContent = c.value; m.title = c.name;
+      const m = document.createElement('div'); m.className = 'mini-card'; m.textContent = c.value; m.title = cardName(c, game.mode);
       disc.appendChild(m);
     });
 
@@ -379,10 +379,11 @@ function renderCard(card, compact) {
   const art = card.img
     ? `<div class="portrait" style="background-image:url('${card.img}')"></div>`
     : `<div class="icon">${card.icon}</div>`;
+  const displayName = cardName(card, game?.mode || 'classic');
   el.innerHTML = `
     <div class="value">${card.value}</div>
     ${art}
-    <div class="name">${card.name}</div>
+    <div class="name" dir="auto">${displayName}</div>
     <div class="desc">${card.desc}</div>
     <div class="value-br">${card.value}</div>
   `;
@@ -510,7 +511,7 @@ function pickGuess(cb, allowGuard = false) {
   cardIds.forEach(id => {
     const c = CARD_DEFS[id];
     const b = document.createElement('button');
-    b.innerHTML = `<b>${c.value} — ${c.name}</b> ${c.icon}`;
+    b.innerHTML = `<b>${c.value} — ${cardName(c, game.mode)}</b> ${c.icon}`;
     b.addEventListener('click', () => { ov.classList.add('hidden'); cb(id); });
     box.appendChild(b);
   });
@@ -608,7 +609,7 @@ function showRules() {
     <ul>
       ${Object.keys(DECKS[game.mode].cards).map(id => {
         const c = CARD_DEFS[id];
-        return `<li><b>${c.value} ${c.name}</b> ${c.icon} — ${c.desc}</li>`;
+        return `<li><b>${c.value} ${cardName(c, game.mode)}</b> ${c.icon} — ${c.desc}</li>`;
       }).join('')}
     </ul>
     <h4>Points clés</h4>

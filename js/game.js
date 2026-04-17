@@ -1,5 +1,5 @@
 // Love Letter game engine. UI-agnostic.
-import { buildDeck, shuffle, TOKENS_TO_WIN, CARD_DEFS, mulberry32 } from './cards.js';
+import { buildDeck, shuffle, TOKENS_TO_WIN, CARD_DEFS, mulberry32, cardName } from './cards.js';
 
 export class Game {
   constructor(config) {
@@ -120,7 +120,7 @@ export class Game {
     if (played.id === 'count') player.countDiscards++;
     if (played.id === 'constable') player.constableActive = true;
 
-    this.pushLog(`<b>${player.name}</b> joue <b>${played.name}</b>`, 'highlight');
+    this.pushLog(`<b>${player.name}</b> joue <b>${cardName(played, this.mode)}</b>`, 'highlight');
 
     // Apply effect
     this.applyEffect(played, intent, player);
@@ -182,10 +182,10 @@ export class Game {
       return;
     }
     if (targetCard && targetCard.id === guess) {
-      this.pushLog(`<b>${player.name}</b> devine juste : <b>${target.name}</b> avait ${CARD_DEFS[guess].name}`, 'elim');
+      this.pushLog(`<b>${player.name}</b> devine juste : <b>${target.name}</b> avait ${cardName(CARD_DEFS[guess], this.mode)}`, 'elim');
       this.eliminate(intent.targetIdx, `${target.name} éliminé·e`);
     } else {
-      this.pushLog(`${player.name} devine ${CARD_DEFS[guess].name} — manqué`);
+      this.pushLog(`${player.name} devine ${cardName(CARD_DEFS[guess], this.mode)} — manqué`);
     }
   }
 
@@ -225,7 +225,7 @@ export class Game {
     target.discard.push(discarded);
     if (discarded.id === 'count') target.countDiscards++;
     if (discarded.id === 'constable') target.constableActive = true;
-    this.pushLog(`<b>${target.name}</b> défausse <b>${discarded.name}</b> (Prince)`);
+    this.pushLog(`<b>${target.name}</b> défausse <b>${cardName(discarded, this.mode)}</b> (Prince)`);
     if (discarded.id === 'princess') {
       this.eliminate(intent.targetIdx, `${target.name} défausse la Princesse`);
       return;
