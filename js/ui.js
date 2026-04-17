@@ -178,12 +178,15 @@ function runBotTurn() {
 }
 
 function handleAfterPlay() {
-  // If reveal pending, show it (only to intended viewer)
+  // If reveal pending, show it (only to intended viewer(s))
   if (game.pendingReveal) {
-    const viewer = game.pendingReveal.viewer;
-    const isForMe = (!online && !game.players[viewer].isBot) || (online && viewer === localSeat);
+    const rev = game.pendingReveal;
+    const viewers = rev.viewers || (rev.viewer != null ? [rev.viewer] : []);
+    const isForMe = online
+      ? viewers.includes(localSeat)
+      : viewers.some(v => !game.players[v].isBot);
     if (isForMe) {
-      showReveal(game.pendingReveal);
+      showReveal(rev);
       game.pendingReveal = null;
       return;
     } else {

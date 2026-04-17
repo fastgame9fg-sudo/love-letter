@@ -15,7 +15,8 @@
       "Bash(git config *)",
       "Bash(git credential *)",
       "Bash(git -c user.email=\"you@local\" -c user.name=\"mekko\" add -A)",
-      "Bash(git -c user.email=\"you@local\" -c user.name=\"mekko\" commit -m \"Add Spy card, turn-order highlights, visible tokens, card legend button\")"
+      "Bash(git -c user.email=\"you@local\" -c user.name=\"mekko\" commit -m \"Add Spy card, turn-order highlights, visible tokens, card legend button\")",
+      "Bash(git -c user.email=\"you@local\" -c user.name=\"mekko\" commit -m \"Baron/Queen: hide winner's card value from public log; reveal to both duelers\")"
     ]
   }
 }

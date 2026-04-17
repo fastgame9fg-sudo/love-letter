@@ -202,16 +202,19 @@ export class Game {
     const mine = player.hand[0];
     const theirs = target.hand[0];
     if (!theirs || !mine) return;
-    this.pendingReveal = { viewer: this.currentIdx, revealed: [
+    // Private reveal to BOTH duelers (they both see the comparison)
+    this.pendingReveal = { viewers: [this.currentIdx, intent.targetIdx], revealed: [
       { playerIdx: this.currentIdx, card: mine },
       { playerIdx: intent.targetIdx, card: theirs },
-    ], note: 'Comparaison Baron' };
+    ], note: 'Duel Baron' };
+    // Public log: only mention elimination (loser's card becomes public via discard).
+    // Never reveal the winner's value.
     if (mine.value > theirs.value) {
-      this.eliminate(intent.targetIdx, `${target.name} perd le duel Baron (${theirs.value} < ${mine.value})`);
+      this.eliminate(intent.targetIdx, `${target.name} perd le duel Baron`);
     } else if (theirs.value > mine.value) {
-      this.eliminate(this.currentIdx, `${player.name} perd le duel Baron (${mine.value} < ${theirs.value})`);
+      this.eliminate(this.currentIdx, `${player.name} perd le duel Baron`);
     } else {
-      this.pushLog(`Égalité Baron (${mine.value}=${theirs.value}) — aucun effet`);
+      this.pushLog(`Égalité au Baron — aucun effet`);
     }
   }
 
@@ -287,12 +290,13 @@ export class Game {
     if (intent.targetIdx == null) return this.pushLog(`${player.name} ne peut cibler personne`);
     const target = this.players[intent.targetIdx];
     const mine = player.hand[0], theirs = target.hand[0];
-    this.pendingReveal = { viewer: this.currentIdx, revealed: [
+    // Both duelers see the comparison privately
+    this.pendingReveal = { viewers: [this.currentIdx, intent.targetIdx], revealed: [
       { playerIdx: this.currentIdx, card: mine },
       { playerIdx: intent.targetIdx, card: theirs },
     ], note: 'Reine-mère' };
     if (mine.value > theirs.value) {
-      this.eliminate(this.currentIdx, `${player.name} est éliminé·e (Reine-mère, plus fort)`);
+      this.eliminate(this.currentIdx, `${player.name} est éliminé·e (Reine-mère)`);
     } else if (theirs.value > mine.value) {
       this.eliminate(intent.targetIdx, `${target.name} est éliminé·e (Reine-mère)`);
     } else {
