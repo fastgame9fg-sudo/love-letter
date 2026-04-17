@@ -1,6 +1,6 @@
 // UI controller. Wires the DOM to the Game engine.
 import { Game } from './game.js';
-import { CARD_DEFS, DECKS, cardName } from './cards.js';
+import { CARD_DEFS, DECKS, cardName, cardForMode } from './cards.js';
 import { aiChooseIntent, aiBishopAccept } from './ai.js';
 
 const $ = (sel) => document.querySelector(sel);
@@ -108,6 +108,10 @@ export function applyRemoteBishop(accept) {
   game.bishopDiscardChoice(accept);
   handleAfterPlay();
 }
+export function applyRemoteChancellor(keepUid) {
+  game.chancellorResolve(keepUid);
+  handleAfterPlay();
+}
 export function startNextRound() {
   if (game.matchEnded) return showMatchEnd();
   game.startRound();
@@ -213,7 +217,6 @@ function handleAfterPlay() {
     const tp = game.players[t];
     if (online) {
       if (t === localSeat) { askBishop(t); return; }
-      // else wait for that player's decision broadcast
       renderAll();
       return;
     }
@@ -224,9 +227,49 @@ function handleAfterPlay() {
       return;
     }
   }
+  if (game.pendingChancellor) {
+    const t = game.pendingChancellor.playerIdx;
+    const tp = game.players[t];
+    if (online) {
+      if (t === localSeat) { askChancellor(); return; }
+      renderAll();
+      return;
+    }
+    if (tp.isBot) {
+      // Bot keeps the highest value card
+      const hand = tp.hand.slice();
+      hand.sort((a, b) => b.value - a.value);
+      const keep = hand[0];
+      game.chancellorResolve(keep.uid);
+    } else {
+      askChancellor();
+      return;
+    }
+  }
   renderAll();
   if (game.phase !== 'round') { nextAction(); return; }
   nextAction();
+}
+
+function askChancellor() {
+  const me = game.players[game.pendingChancellor.playerIdx];
+  const ov = $('#overlay');
+  $('#overlay-title').textContent = 'Chancelier';
+  $('#overlay-subtitle').textContent = 'Choisis une carte à garder, les 2 autres vont sous la pioche.';
+  const opts = $('#overlay-options');
+  opts.innerHTML = '';
+  me.hand.forEach(c => {
+    const b = document.createElement('button');
+    b.innerHTML = `<b>${c.value} — ${cardName(c, game.mode)}</b> ${c.icon}`;
+    b.addEventListener('click', () => {
+      ov.classList.add('hidden');
+      if (online) online.sendChancellor(c.uid);
+      else { game.chancellorResolve(c.uid); handleAfterPlay(); }
+    });
+    opts.appendChild(b);
+  });
+  $('#overlay-cancel').classList.add('hidden');
+  ov.classList.remove('hidden');
 }
 
 function askBishop(targetIdx) {
@@ -560,7 +603,7 @@ function pickGuess(cb, allowGuard = false) {
   const mode = game.mode;
   const cardIds = Object.keys(DECKS[mode].cards).filter(id => allowGuard || id !== 'guard');
   cardIds.forEach(id => {
-    const c = CARD_DEFS[id];
+    const c = cardForMode(id, mode);
     const b = document.createElement('button');
     b.innerHTML = `<b>${c.value} — ${cardName(c, game.mode)}</b> ${c.icon}`;
     b.addEventListener('click', () => { ov.classList.add('hidden'); cb(id); });
@@ -659,7 +702,7 @@ function showRules() {
     <h4>Cartes (${DECKS[game.mode].name})</h4>
     <ul>
       ${Object.keys(DECKS[game.mode].cards).map(id => {
-        const c = CARD_DEFS[id];
+        const c = cardForMode(id, game.mode);
         return `<li><b>${c.value} ${cardName(c, game.mode)}</b> ${c.icon} — ${c.desc}</li>`;
       }).join('')}
     </ul>

@@ -33,6 +33,8 @@ export class HostController {
           this.broadcastBishop(data.accept);
         } else if (data.type === 'drawRequest') {
           this.broadcastDraw();
+        } else if (data.type === 'chancellor') {
+          this.broadcastChancellor(data.keepUid);
         }
       },
       onDisconnect: () => {
@@ -94,10 +96,16 @@ export class HostController {
     this.onDraw && this.onDraw();
   }
 
+  broadcastChancellor(keepUid) {
+    this.server.broadcast({ type: 'chancellor', keepUid });
+    this.onChancellor && this.onChancellor(keepUid);
+  }
+
   sendIntent(intent) { this.broadcastAction(intent); }
   sendBishop(accept) { this.broadcastBishop(accept); }
   sendNextRound() { this.broadcastNextRound(); }
   sendDraw() { this.broadcastDraw(); }
+  sendChancellor(keepUid) { this.broadcastChancellor(keepUid); }
   close() { this.server?.close(); }
 }
 
@@ -130,6 +138,8 @@ export class GuestController {
           this.onNextRound && this.onNextRound();
         } else if (data.type === 'draw') {
           this.onDraw && this.onDraw();
+        } else if (data.type === 'chancellor') {
+          this.onChancellor && this.onChancellor(data.keepUid);
         } else if (data.type === 'lobby') {
           this.onLobbyUpdate && this.onLobbyUpdate(data);
         }
@@ -142,5 +152,6 @@ export class GuestController {
   sendIntent(intent) { this.client.send({ type: 'intent', intent }); }
   sendBishop(accept) { this.client.send({ type: 'bishopAccept', accept }); }
   sendDraw() { this.client.send({ type: 'drawRequest' }); }
+  sendChancellor(keepUid) { this.client.send({ type: 'chancellor', keepUid }); }
   close() { this.client?.close(); }
 }

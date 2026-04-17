@@ -161,6 +161,7 @@ export class Game {
       case 'jester': this.effectJester(intent, player); break;
       case 'assassin': this.pushLog(`${player.name} défausse l'Assassin (aucun effet direct)`); break;
       case 'spy': this.pushLog(`${player.name} défausse l'Espionne`); break;
+      case 'chancellor': this.effectChancellor(intent, player); break;
       case 'cardinal': this.effectCardinal(intent, player); break;
       case 'baroness': this.effectBaroness(intent, player); break;
       case 'sycophant': this.effectSycophant(intent, player); break;
@@ -320,6 +321,40 @@ export class Game {
     } else {
       this.pushLog(`${player.name} rate (Évêque)`);
     }
+  }
+
+  effectChancellor(intent, player) {
+    const drawn = [];
+    for (let i = 0; i < 2; i++) {
+      if (this.deck.length > 0) drawn.push(this.deck.pop());
+    }
+    drawn.forEach(c => player.hand.push(c));
+    this.pushLog(`${player.name} joue le Chancelier — pioche ${drawn.length} carte(s)`);
+    if (drawn.length === 0) return;
+    this.pendingChancellor = { playerIdx: this.currentIdx };
+  }
+
+  chancellorResolve(keepUid, orderUids = []) {
+    if (!this.pendingChancellor) return;
+    const p = this.players[this.pendingChancellor.playerIdx];
+    const keepIdx = p.hand.findIndex(c => c.uid === keepUid);
+    if (keepIdx === -1) return;
+    const kept = p.hand[keepIdx];
+    p.hand.splice(keepIdx, 1);
+    // Put the remaining cards at the bottom of the deck in chosen order.
+    // orderUids lists the uids from TOP to BOTTOM of new stack under the deck;
+    // the last uid in orderUids becomes the very bottom.
+    const order = orderUids.length ? orderUids : p.hand.map(c => c.uid);
+    for (const uid of order) {
+      const idx = p.hand.findIndex(c => c.uid === uid);
+      if (idx !== -1) {
+        const c = p.hand.splice(idx, 1)[0];
+        this.deck.unshift(c);
+      }
+    }
+    while (p.hand.length > 0) this.deck.unshift(p.hand.shift());
+    p.hand.push(kept);
+    this.pendingChancellor = null;
   }
 
   bishopDiscardChoice(accept) {

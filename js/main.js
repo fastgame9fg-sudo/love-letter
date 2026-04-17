@@ -1,5 +1,5 @@
 // Entry point — handles setup (local + online) and wires game start.
-import { initSetup, startGame, applyRemoteIntent, applyRemoteBishop, applyRemoteDraw, startNextRound, showScreen, getGame } from './ui.js';
+import { initSetup, startGame, applyRemoteIntent, applyRemoteBishop, applyRemoteDraw, applyRemoteChancellor, startNextRound, showScreen, getGame } from './ui.js';
 import { HostController, GuestController } from './online-controller.js';
 
 const $ = (s) => document.querySelector(s);
@@ -144,6 +144,7 @@ async function hostStartGame() {
   hostCtrl.onBishopAccept = (accept) => applyRemoteBishop(accept);
   hostCtrl.onNextRound = () => startNextRound();
   hostCtrl.onDraw = () => applyRemoteDraw();
+  hostCtrl.onChancellor = (keepUid) => applyRemoteChancellor(keepUid);
 
   const onlineAdapter = buildHostAdapter(hostCtrl);
   startGame(config, { online: onlineAdapter, localSeat: 0 });
@@ -156,6 +157,7 @@ function buildHostAdapter(h) {
     sendBishop: (accept) => h.sendBishop(accept),
     sendNextRound: () => h.sendNextRound(),
     sendDraw: () => h.sendDraw(),
+    sendChancellor: (keepUid) => h.sendChancellor(keepUid),
   };
 }
 
@@ -180,6 +182,7 @@ async function guestJoinRoom() {
       onBishopAccept: (accept) => applyRemoteBishop(accept),
       onNextRound: () => startNextRound(),
       onDraw: () => applyRemoteDraw(),
+      onChancellor: (keepUid) => applyRemoteChancellor(keepUid),
       onDisconnect: () => alert('Déconnecté de l\'hôte'),
     });
     await guestCtrl.start();
@@ -200,5 +203,6 @@ function buildGuestAdapter(g) {
     sendBishop: (accept) => g.sendBishop(accept),
     sendNextRound: () => {},
     sendDraw: () => g.sendDraw(),
+    sendChancellor: (keepUid) => g.sendChancellor(keepUid),
   };
 }

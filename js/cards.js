@@ -4,19 +4,24 @@
 
 const IMG = (name) => `assets/cards/${name}.png`;
 
+// Note: Default `value` fields below match the Premium edition numbering
+// (King=6, Countess=7, Princess=8). Classic/Extended modes use the modern
+// 2019 numbering (King=7, Countess=8, Princess=9) via `cardForMode` overrides.
+// Darija names map to the modern numbering's positions.
 export const CARD_DEFS = {
-  // Classic cards (1..8)
-  guard:     { id: 'guard',     value: 1, name: 'Garde',     darijaName: 'الڭارديان',      icon: '⚔️',  img: IMG('guard'),     desc: "Nomme un type (non-Garde). Si l'adversaire l'a, il est éliminé." },
-  priest:    { id: 'priest',    value: 2, name: 'Prêtre',    darijaName: 'الجارة',          icon: '🕯️',  img: IMG('priest'),    desc: "Regarde en secret la main d'un adversaire." },
-  baron:     { id: 'baron',     value: 3, name: 'Baron',     darijaName: 'المسطي',          icon: '⚖️',  img: IMG('baron'),     desc: "Compare en secret avec un adversaire. Le plus faible est éliminé." },
-  handmaid:  { id: 'handmaid',  value: 4, name: 'Servante',  darijaName: 'البلغة الضايعة',  icon: '🛡️',  img: IMG('handmaid'),  desc: "Tu es protégé jusqu'à ton prochain tour." },
-  prince:    { id: 'prince',    value: 5, name: 'Prince',    darijaName: 'المخازني',        icon: '👑',  img: IMG('prince'),    desc: "Un joueur (toi inclus) défausse sa main et en pioche une nouvelle." },
-  king:      { id: 'king',      value: 6, name: 'Roi',       darijaName: 'العڭوزة',         icon: '🤴',  img: IMG('king'),      desc: "Échange ta main avec celle d'un adversaire." },
-  countess:  { id: 'countess',  value: 7, name: 'Comtesse',  darijaName: 'القايد',          icon: '👸',  img: IMG('countess'),  desc: "Doit être défaussée si tu as aussi le Roi ou le Prince." },
-  princess:  { id: 'princess',  value: 8, name: 'Princesse', darijaName: 'للاّ',             icon: '💖',  img: IMG('princess'),  desc: "Si tu la défausses, tu es éliminé." },
+  // Base cards
+  guard:     { id: 'guard',     value: 1, name: 'Garde',     darijaName: 'الڭارديان',      icon: '⚔️',  img: IMG('guard'),     desc: "Choisis un autre joueur et nomme un personnage autre que Garde. S'il a cette carte, il quitte la manche." },
+  priest:    { id: 'priest',    value: 2, name: 'Prêtre',    darijaName: 'الجارة',          icon: '🕯️',  img: IMG('priest'),    desc: "Choisis un autre joueur et regarde sa main (sans la montrer)." },
+  baron:     { id: 'baron',     value: 3, name: 'Baron',     darijaName: 'المسطي',          icon: '⚖️',  img: IMG('baron'),     desc: "Compare discrètement ta main avec un autre joueur. La valeur la plus faible quitte la manche. Égalité : rien." },
+  handmaid:  { id: 'handmaid',  value: 4, name: 'Servante',  darijaName: 'البلغة الضايعة',  icon: '🛡️',  img: IMG('handmaid'),  desc: "Jusqu'à ton prochain tour, les autres joueurs ne peuvent pas te cibler." },
+  prince:    { id: 'prince',    value: 5, name: 'Prince',    darijaName: 'المخازني',        icon: '👑',  img: IMG('prince'),    desc: "Choisis n'importe quel joueur (toi inclus). Il défausse sa main (sans effet) et en pioche une nouvelle." },
+  king:      { id: 'king',      value: 6, name: 'Roi',       darijaName: 'القايد',          icon: '🤴',  img: IMG('king'),      desc: "Choisis un autre joueur et échange vos mains." },
+  countess:  { id: 'countess',  value: 7, name: 'Comtesse',  darijaName: 'للاّ',             icon: '👸',  img: IMG('countess'),  desc: "Aucun effet. Si ta main contient le Roi ou un Prince, tu dois jouer la Comtesse." },
+  princess:  { id: 'princess',  value: 8, name: 'Princesse', darijaName: 'العروسة',         icon: '💖',  img: IMG('princess'),  desc: "Si tu la joues ou la défausses, tu quittes la manche." },
 
-  // Premium-only cards
-  spy:       { id: 'spy',       value: 0, name: 'Espionne',  icon: '🕵️',  img: IMG('spy'),       desc: "En fin de manche, si tu es seul à avoir joué au moins une Espionne, tu gagnes 1 jeton." },
+  // Cards from the "édition intégrale" / Premium only
+  spy:       { id: 'spy',       value: 0, name: 'Espionne',  darijaName: 'الڭريمة',         icon: '🕵️',  img: IMG('spy'),       desc: "En fin de manche, si tu es seul à avoir joué au moins une Espionne, tu gagnes 1 pion Faveur supplémentaire." },
+  chancellor:{ id: 'chancellor',value: 6, name: 'Chancelier',darijaName: 'العڭوزة',         icon: '📜',                         desc: "Pioche 2 cartes. Garde 1 et remets les 2 autres sous la pioche dans l'ordre de ton choix." },
   jester:    { id: 'jester',    value: 0, name: 'Bouffon',   icon: '🃏',  desc: "Parie sur un joueur. S'il gagne la manche, tu gagnes un jeton." },
   assassin:  { id: 'assassin',  value: 0, name: 'Assassin',  icon: '🗡️',  desc: "Si un Garde te désigne, il est éliminé au lieu de toi." },
   cardinal:  { id: 'cardinal',  value: 2, name: 'Cardinal',  icon: '⛪',  desc: "Deux joueurs échangent leur main, puis tu regardes la main de l'un d'eux." },
@@ -59,25 +64,40 @@ export const DECKS = {
     cards: {
       guard: 8, priest: 2, baron: 2, handmaid: 2, prince: 2,
       king: 1, countess: 1, princess: 1,
-      spy: 2, jester: 1, assassin: 1, cardinal: 2, baroness: 2,
+      spy: 2, chancellor: 1, jester: 1, assassin: 1, cardinal: 2, baroness: 2,
       sycophant: 2, count: 2, constable: 2, queen: 1, bishop: 1,
     },
   },
 };
 
-// Tokens needed to win the match based on player count
-// (official rule: 2p→7, 3p→5, 4p→4, extended for more players)
+// Tokens needed to win the match based on player count (2019 PDF rules).
+// 2p→6, 3p→5, 4p→4, extrapolated for 5-6 players.
 export const TOKENS_TO_WIN = {
-  2: 7, 3: 5, 4: 4, 5: 4, 6: 3,
+  2: 6, 3: 5, 4: 4, 5: 4, 6: 3,
 };
+
+// Apply mode-specific overrides on top of base card defs.
+// Classic/Extended modes use the modern 2019 numbering: King=7, Countess=8, Princess=9.
+// Premium uses the original numbering (King=6, Countess=7, Princess=8).
+export function cardForMode(cardId, mode) {
+  const base = CARD_DEFS[cardId];
+  if (!base) return null;
+  if (mode === 'classic' || mode === 'extended') {
+    if (cardId === 'king')     return { ...base, value: 7 };
+    if (cardId === 'countess') return { ...base, value: 8 };
+    if (cardId === 'princess') return { ...base, value: 9 };
+  }
+  return base;
+}
 
 export function buildDeck(mode) {
   const def = DECKS[mode];
   const deck = [];
   let uid = 0;
   for (const [cardId, count] of Object.entries(def.cards)) {
+    const tpl = cardForMode(cardId, mode);
     for (let i = 0; i < count; i++) {
-      deck.push({ uid: uid++, ...CARD_DEFS[cardId] });
+      deck.push({ uid: uid++, ...tpl });
     }
   }
   return deck;
