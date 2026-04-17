@@ -2,19 +2,21 @@
 // Each card: { id, value, name, icon, desc, count }
 // "count" depends on the mode. Effects are identified by id and handled in game.js.
 
+const IMG = (name) => `assets/cards/${name}.png`;
+
 export const CARD_DEFS = {
   // Classic cards (1..8)
-  guard:     { id: 'guard',     value: 1, name: 'Garde',     icon: '⚔️',  desc: "Nomme un type (non-Garde). Si l'adversaire l'a, il est éliminé." },
-  priest:    { id: 'priest',    value: 2, name: 'Prêtre',    icon: '🕯️',  desc: "Regarde en secret la main d'un adversaire." },
-  baron:     { id: 'baron',     value: 3, name: 'Baron',     icon: '⚖️',  desc: "Compare en secret avec un adversaire. Le plus faible est éliminé." },
-  handmaid:  { id: 'handmaid',  value: 4, name: 'Servante',  icon: '🛡️',  desc: "Tu es protégé jusqu'à ton prochain tour." },
-  prince:    { id: 'prince',    value: 5, name: 'Prince',    icon: '👑',  desc: "Un joueur (toi inclus) défausse sa main et en pioche une nouvelle." },
-  king:      { id: 'king',      value: 6, name: 'Roi',       icon: '🤴',  desc: "Échange ta main avec celle d'un adversaire." },
-  countess:  { id: 'countess',  value: 7, name: 'Comtesse',  icon: '👸',  desc: "Doit être défaussée si tu as aussi le Roi ou le Prince." },
-  princess:  { id: 'princess',  value: 8, name: 'Princesse', icon: '💖',  desc: "Si tu la défausses, tu es éliminé." },
+  guard:     { id: 'guard',     value: 1, name: 'Garde',     icon: '⚔️',  img: IMG('guard'),     desc: "Nomme un type (non-Garde). Si l'adversaire l'a, il est éliminé." },
+  priest:    { id: 'priest',    value: 2, name: 'Prêtre',    icon: '🕯️',  img: IMG('priest'),    desc: "Regarde en secret la main d'un adversaire." },
+  baron:     { id: 'baron',     value: 3, name: 'Baron',     icon: '⚖️',  img: IMG('baron'),     desc: "Compare en secret avec un adversaire. Le plus faible est éliminé." },
+  handmaid:  { id: 'handmaid',  value: 4, name: 'Servante',  icon: '🛡️',  img: IMG('handmaid'),  desc: "Tu es protégé jusqu'à ton prochain tour." },
+  prince:    { id: 'prince',    value: 5, name: 'Prince',    icon: '👑',  img: IMG('prince'),    desc: "Un joueur (toi inclus) défausse sa main et en pioche une nouvelle." },
+  king:      { id: 'king',      value: 6, name: 'Roi',       icon: '🤴',  img: IMG('king'),      desc: "Échange ta main avec celle d'un adversaire." },
+  countess:  { id: 'countess',  value: 7, name: 'Comtesse',  icon: '👸',  img: IMG('countess'),  desc: "Doit être défaussée si tu as aussi le Roi ou le Prince." },
+  princess:  { id: 'princess',  value: 8, name: 'Princesse', icon: '💖',  img: IMG('princess'),  desc: "Si tu la défausses, tu es éliminé." },
 
   // Premium-only cards
-  spy:       { id: 'spy',       value: 0, name: 'Espionne',  icon: '🕵️',  desc: "En fin de manche, si tu es seul à avoir joué au moins une Espionne, tu gagnes 1 jeton." },
+  spy:       { id: 'spy',       value: 0, name: 'Espionne',  icon: '🕵️',  img: IMG('spy'),       desc: "En fin de manche, si tu es seul à avoir joué au moins une Espionne, tu gagnes 1 jeton." },
   jester:    { id: 'jester',    value: 0, name: 'Bouffon',   icon: '🃏',  desc: "Parie sur un joueur. S'il gagne la manche, tu gagnes un jeton." },
   assassin:  { id: 'assassin',  value: 0, name: 'Assassin',  icon: '🗡️',  desc: "Si un Garde te désigne, il est éliminé au lieu de toi." },
   cardinal:  { id: 'cardinal',  value: 2, name: 'Cardinal',  icon: '⛪',  desc: "Deux joueurs échangent leur main, puis tu regardes la main de l'un d'eux." },

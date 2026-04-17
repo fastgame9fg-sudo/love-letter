@@ -16,7 +16,8 @@
       "Bash(git credential *)",
       "Bash(git -c user.email=\"you@local\" -c user.name=\"mekko\" add -A)",
       "Bash(git -c user.email=\"you@local\" -c user.name=\"mekko\" commit -m \"Add Spy card, turn-order highlights, visible tokens, card legend button\")",
-      "Bash(git -c user.email=\"you@local\" -c user.name=\"mekko\" commit -m \"Baron/Queen: hide winner's card value from public log; reveal to both duelers\")"
+      "Bash(git -c user.email=\"you@local\" -c user.name=\"mekko\" commit -m \"Baron/Queen: hide winner's card value from public log; reveal to both duelers\")",
+      "Bash(python -c \"from PIL import Image; im1 = Image.open\\('assets/Love letter 1.png'\\); im2 = Image.open\\('assets/Love letter 2.jpg'\\); print\\('sheet1:', im1.size\\); print\\('sheet2:', im2.size\\)\")"
     ]
   }
 }

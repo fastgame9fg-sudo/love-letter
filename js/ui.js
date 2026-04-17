@@ -375,10 +375,13 @@ function viewerIdx() {
 
 function renderCard(card, compact) {
   const el = document.createElement('div');
-  el.className = 'card' + (compact ? ' played-card' : '');
+  el.className = 'card' + (compact ? ' played-card' : '') + (card.img ? ' has-img' : '');
+  const art = card.img
+    ? `<div class="portrait" style="background-image:url('${card.img}')"></div>`
+    : `<div class="icon">${card.icon}</div>`;
   el.innerHTML = `
     <div class="value">${card.value}</div>
-    <div class="icon">${card.icon}</div>
+    ${art}
     <div class="name">${card.name}</div>
     <div class="desc">${card.desc}</div>
     <div class="value-br">${card.value}</div>
