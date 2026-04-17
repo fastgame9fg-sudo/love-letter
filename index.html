@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Love Letter</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <div id="app">
+    <!-- Setup screen -->
+    <section id="setup-screen" class="screen active">
+      <div class="setup-card">
+        <h1 class="title">Love Letter</h1>
+        <p class="subtitle">Fais parvenir ta lettre à la Princesse</p>
+
+        <div class="setup-tabs">
+          <button class="tab-btn active" data-tab="local">Local / Solo</button>
+          <button class="tab-btn" data-tab="online">En ligne</button>
+        </div>
+
+        <div id="local-setup">
+        <div class="setup-group">
+          <label>Mode de jeu</label>
+          <div class="mode-grid">
+            <button class="mode-btn active" data-mode="classic">
+              <span class="mode-name">Classique</span>
+              <span class="mode-info">16 cartes · 2-4 joueurs</span>
+            </button>
+            <button class="mode-btn" data-mode="extended">
+              <span class="mode-name">Classique étendu</span>
+              <span class="mode-info">24 cartes · 2-6 joueurs</span>
+            </button>
+            <button class="mode-btn" data-mode="premium">
+              <span class="mode-name">Premium</span>
+              <span class="mode-info">32 cartes · 2-6 joueurs</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="setup-group">
+          <label>Nombre de joueurs</label>
+          <div class="player-count" id="player-count">
+            <button data-count="2">2</button>
+            <button data-count="3">3</button>
+            <button data-count="4" class="active">4</button>
+            <button data-count="5">5</button>
+            <button data-count="6">6</button>
+          </div>
+        </div>
+
+        <div class="setup-group">
+          <label>Joueurs <span class="hint">(coche les bots)</span></label>
+          <div id="player-list"></div>
+        </div>
+
+        <button id="start-btn" class="primary-btn">Commencer la partie</button>
+        </div>
+
+        <div id="online-setup" class="hidden">
+          <div class="online-tabs">
+            <button class="tab-btn active" data-online-tab="create">Créer une partie</button>
+            <button class="tab-btn" data-online-tab="join">Rejoindre</button>
+          </div>
+
+          <div id="create-panel">
+            <div class="setup-group">
+              <label>Ton pseudo</label>
+              <input type="text" id="host-name" class="text-input" value="Hôte" maxlength="16" />
+            </div>
+            <div class="setup-group">
+              <label>Mode</label>
+              <div class="mode-grid" id="online-mode-grid">
+                <button class="mode-btn active" data-online-mode="classic"><span class="mode-name">Classique</span><span class="mode-info">16 · 2-4</span></button>
+                <button class="mode-btn" data-online-mode="extended"><span class="mode-name">Étendu</span><span class="mode-info">24 · 2-6</span></button>
+                <button class="mode-btn" data-online-mode="premium"><span class="mode-name">Premium</span><span class="mode-info">32 · 2-6</span></button>
+              </div>
+            </div>
+            <button id="create-room-btn" class="primary-btn">Créer la salle</button>
+
+            <div id="lobby-host" class="hidden lobby">
+              <div class="room-code">
+                <span>Code :</span>
+                <strong id="room-code-display">----</strong>
+                <button class="secondary-btn" id="copy-code-btn">Copier</button>
+              </div>
+              <div class="setup-group">
+                <label>Joueurs connectés</label>
+                <div id="lobby-players"></div>
+              </div>
+              <div class="setup-group">
+                <label>Remplir avec des bots ?</label>
+                <div class="player-count" id="bots-count">
+                  <button data-bots="0" class="active">0</button>
+                  <button data-bots="1">+1</button>
+                  <button data-bots="2">+2</button>
+                  <button data-bots="3">+3</button>
+                  <button data-bots="4">+4</button>
+                </div>
+              </div>
+              <button id="start-online-btn" class="primary-btn">Démarrer la partie</button>
+            </div>
+          </div>
+
+          <div id="join-panel" class="hidden">
+            <div class="setup-group">
+              <label>Ton pseudo</label>
+              <input type="text" id="guest-name" class="text-input" value="" placeholder="Ton pseudo" maxlength="16" />
+            </div>
+            <div class="setup-group">
+              <label>Code de la salle</label>
+              <input type="text" id="room-code-input" class="text-input code-input" value="" placeholder="XXXX" maxlength="4" />
+            </div>
+            <button id="join-room-btn" class="primary-btn">Rejoindre</button>
+
+            <div id="lobby-guest" class="hidden lobby">
+              <p class="lobby-status" id="guest-status">En attente de l'hôte...</p>
+              <div class="setup-group">
+                <label>Joueurs</label>
+                <div id="lobby-players-guest"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Pass device screen -->
+    <section id="pass-screen" class="screen">
+      <div class="pass-card">
+        <div class="pass-icon">📱</div>
+        <h2 id="pass-name">Joueur</h2>
+        <p>Prends l'appareil puis appuie pour voir ta main.</p>
+        <button id="pass-btn" class="primary-btn">Je suis prêt</button>
+      </div>
+    </section>
+
+    <!-- Game screen -->
+    <section id="game-screen" class="screen">
+      <header class="game-header">
+        <div class="deck-info">
+          <div class="deck-pile" id="deck-pile">
+            <span class="deck-count" id="deck-count">0</span>
+          </div>
+          <span class="deck-label">Pioche</span>
+        </div>
+        <div class="round-info">
+          <div class="round-label">Manche <span id="round-number">1</span></div>
+          <div class="mode-label" id="mode-label"></div>
+        </div>
+        <button id="rules-btn" class="icon-btn" title="Règles">?</button>
+      </header>
+
+      <div class="opponents" id="opponents"></div>
+
+      <div class="table-area">
+        <div class="play-area" id="play-area"></div>
+        <div class="log" id="log"></div>
+      </div>
+
+      <div class="current-player" id="current-player">
+        <div class="player-name-bar">
+          <span id="current-name">Joueur</span>
+          <span id="current-tokens" class="tokens"></span>
+        </div>
+        <div class="hand" id="hand"></div>
+      </div>
+
+      <!-- Target picker overlay -->
+      <div id="overlay" class="overlay hidden">
+        <div class="overlay-card">
+          <h3 id="overlay-title">Choisis une cible</h3>
+          <p id="overlay-subtitle"></p>
+          <div id="overlay-options" class="overlay-options"></div>
+          <button id="overlay-cancel" class="secondary-btn hidden">Annuler</button>
+        </div>
+      </div>
+
+      <!-- Reveal card overlay (Priest, Baroness etc) -->
+      <div id="reveal" class="overlay hidden">
+        <div class="overlay-card">
+          <h3 id="reveal-title"></h3>
+          <div id="reveal-cards" class="reveal-cards"></div>
+          <button id="reveal-ok" class="primary-btn">OK</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Round end screen -->
+    <section id="round-end-screen" class="screen">
+      <div class="end-card">
+        <h2 id="round-end-title">Fin de manche</h2>
+        <p id="round-end-winner"></p>
+        <div id="round-end-scores" class="scores"></div>
+        <button id="next-round-btn" class="primary-btn">Manche suivante</button>
+      </div>
+    </section>
+
+    <!-- Match end screen -->
+    <section id="match-end-screen" class="screen">
+      <div class="end-card victory">
+        <div class="crown">👑</div>
+        <h2>Victoire</h2>
+        <p id="match-end-winner"></p>
+        <div id="match-end-scores" class="scores"></div>
+        <button id="restart-btn" class="primary-btn">Nouvelle partie</button>
+      </div>
+    </section>
+
+    <!-- Rules modal -->
+    <div id="rules-modal" class="overlay hidden">
+      <div class="overlay-card rules-card">
+        <h3>Règles rapides</h3>
+        <div id="rules-content"></div>
+        <button id="rules-close" class="primary-btn">Fermer</button>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>
