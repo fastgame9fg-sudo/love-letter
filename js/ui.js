@@ -100,6 +100,10 @@ export function startGame(config, opts = {}) {
 
 export function getGame() { return game; }
 export function applyRemoteIntent(intent) {
+  // Defensive: if we're still awaiting draw (desync), catch up by drawing first.
+  if (game.awaitingDraw) {
+    game.drawCard();
+  }
   try { game.playCard(intent); }
   catch (e) { console.error('applyRemoteIntent failed', e); return; }
   handleAfterPlay();

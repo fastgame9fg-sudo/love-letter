@@ -4,12 +4,14 @@
 import { createHost, joinHost } from './online.js';
 
 export class HostController {
-  constructor({ hostName, onLobbyUpdate, onStart, onIntent, onBishopAccept, onNextRound }) {
+  constructor({ hostName, onLobbyUpdate, onStart, onIntent, onBishopAccept, onNextRound, onDraw, onChancellor }) {
     this.hostName = hostName;
     this.onLobbyUpdate = onLobbyUpdate;
     this.onIntent = onIntent;
     this.onBishopAccept = onBishopAccept;
     this.onNextRound = onNextRound;
+    this.onDraw = onDraw;
+    this.onChancellor = onChancellor;
     this.onStart = onStart;
     this.server = null;
     this.connectedGuests = []; // [{peerId, name}]
@@ -110,7 +112,7 @@ export class HostController {
 }
 
 export class GuestController {
-  constructor({ name, code, onLobbyUpdate, onStart, onIntent, onBishopAccept, onNextRound, onDisconnect }) {
+  constructor({ name, code, onLobbyUpdate, onStart, onIntent, onBishopAccept, onNextRound, onDraw, onChancellor, onDisconnect }) {
     this.name = name;
     this.code = code;
     this.onLobbyUpdate = onLobbyUpdate;
@@ -118,6 +120,8 @@ export class GuestController {
     this.onIntent = onIntent;
     this.onBishopAccept = onBishopAccept;
     this.onNextRound = onNextRound;
+    this.onDraw = onDraw;
+    this.onChancellor = onChancellor;
     this.onDisconnect = onDisconnect;
     this.client = null;
   }
