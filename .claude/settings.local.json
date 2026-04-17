@@ -7,7 +7,15 @@
       "Bash(gh auth *)",
       "Bash(git init *)",
       "Bash(git add *)",
-      "Bash(git -c user.email=\"you@local\" -c user.name=\"mekko\" commit -m \"Initial Love Letter game: 3 modes, 2-6 players, local + online\")"
+      "Bash(git -c user.email=\"you@local\" -c user.name=\"mekko\" commit -m \"Initial Love Letter game: 3 modes, 2-6 players, local + online\")",
+      "Bash(curl -sI https://github.com/fastgame9fg-sudo/love-letter)",
+      "Bash(git remote *)",
+      "Bash(git push *)",
+      "Bash(cmdkey /list)",
+      "Bash(git config *)",
+      "Bash(git credential *)",
+      "Bash(git -c user.email=\"you@local\" -c user.name=\"mekko\" add -A)",
+      "Bash(git -c user.email=\"you@local\" -c user.name=\"mekko\" commit -m \"Add Spy card, turn-order highlights, visible tokens, card legend button\")"
     ]
   }
 }

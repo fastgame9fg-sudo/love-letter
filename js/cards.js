@@ -14,6 +14,7 @@ export const CARD_DEFS = {
   princess:  { id: 'princess',  value: 8, name: 'Princesse', icon: '💖',  desc: "Si tu la défausses, tu es éliminé." },
 
   // Premium-only cards
+  spy:       { id: 'spy',       value: 0, name: 'Espionne',  icon: '🕵️',  desc: "En fin de manche, si tu es seul à avoir joué au moins une Espionne, tu gagnes 1 jeton." },
   jester:    { id: 'jester',    value: 0, name: 'Bouffon',   icon: '🃏',  desc: "Parie sur un joueur. S'il gagne la manche, tu gagnes un jeton." },
   assassin:  { id: 'assassin',  value: 0, name: 'Assassin',  icon: '🗡️',  desc: "Si un Garde te désigne, il est éliminé au lieu de toi." },
   cardinal:  { id: 'cardinal',  value: 2, name: 'Cardinal',  icon: '⛪',  desc: "Deux joueurs échangent leur main, puis tu regardes la main de l'un d'eux." },
@@ -49,7 +50,7 @@ export const DECKS = {
     cards: {
       guard: 8, priest: 2, baron: 2, handmaid: 2, prince: 2,
       king: 1, countess: 1, princess: 1,
-      jester: 1, assassin: 1, cardinal: 2, baroness: 2,
+      spy: 2, jester: 1, assassin: 1, cardinal: 2, baroness: 2,
       sycophant: 2, count: 2, constable: 2, queen: 1, bishop: 1,
     },
   },

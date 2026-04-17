@@ -325,6 +325,21 @@ html, body {
   cursor: pointer;
   font-size: 16px;
 }
+.rules-btn {
+  padding: 8px 14px;
+  background: rgba(192, 74, 255, 0.15);
+  border: 1px solid var(--accent-2);
+  border-radius: 10px;
+  color: var(--text);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.rules-btn:hover {
+  background: rgba(192, 74, 255, 0.3);
+  transform: translateY(-1px);
+}
 
 /* Opponents */
 .opponents {
@@ -348,8 +363,58 @@ html, body {
 }
 .opponent.targetable { cursor: pointer; border-color: var(--accent); box-shadow: 0 0 20px rgba(255, 107, 157, 0.4); }
 .opponent.targetable:hover { transform: translateY(-4px); background: rgba(255, 107, 157, 0.1); }
-.opponent.current { border-color: var(--gold); box-shadow: 0 0 18px rgba(245, 197, 24, 0.35); }
+.opponent.current {
+  border-color: var(--gold);
+  box-shadow: 0 0 26px rgba(245, 197, 24, 0.55);
+  background: rgba(245, 197, 24, 0.08);
+  transform: translateY(-3px);
+}
+.opponent.next {
+  border-color: rgba(245, 197, 24, 0.45);
+  box-shadow: 0 0 12px rgba(245, 197, 24, 0.18);
+}
 .opponent.eliminated { opacity: 0.35; filter: grayscale(0.7); }
+.opponent .turn-badge {
+  position: absolute;
+  top: -9px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: linear-gradient(135deg, var(--gold), #ff9b3d);
+  color: #2b1700;
+  font-size: 9px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 10px;
+  letter-spacing: 1px;
+  white-space: nowrap;
+  text-transform: uppercase;
+  box-shadow: 0 2px 8px rgba(245, 197, 24, 0.4);
+}
+.opponent.next .turn-badge {
+  background: rgba(245, 197, 24, 0.25);
+  color: var(--gold);
+  box-shadow: none;
+  font-weight: 600;
+}
+.opponent .token-count {
+  position: absolute;
+  top: -10px;
+  right: -8px;
+  background: linear-gradient(135deg, #ff6b9d, #c04aff);
+  color: white;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 10px;
+  min-width: 24px;
+  text-align: center;
+  box-shadow: 0 2px 8px rgba(192, 74, 255, 0.4);
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  justify-content: center;
+}
+.opponent .token-count::before { content: '💝'; font-size: 10px; }
 .opponent.protected::after {
   content: '🛡️';
   position: absolute;
@@ -413,6 +478,16 @@ html, body {
   font-size: 12px;
   max-height: 220px;
 }
+.log-header {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: var(--accent);
+  margin-bottom: 6px;
+  font-weight: 700;
+  padding-bottom: 4px;
+  border-bottom: 1px solid rgba(192, 74, 255, 0.25);
+}
 .log-entry {
   padding: 4px 6px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.05);
@@ -431,6 +506,15 @@ html, body {
   border-radius: 14px;
   border: 1px solid var(--panel-border);
   padding: 12px;
+  transition: all 0.3s;
+}
+.current-player.my-turn {
+  border-color: var(--gold);
+  box-shadow: 0 0 30px rgba(245, 197, 24, 0.35);
+  background: linear-gradient(180deg, rgba(245, 197, 24, 0.08), var(--panel));
+}
+.current-player.my-next {
+  border-color: rgba(245, 197, 24, 0.35);
 }
 .player-name-bar {
   display: flex; justify-content: space-between; align-items: center;
@@ -648,7 +732,9 @@ html, body {
 @media (max-width: 720px) {
   .title { font-size: 36px; }
   .mode-grid { grid-template-columns: 1fr; }
-  .log { display: none; }
+  .table-area { flex-direction: column; }
+  .log { width: 100%; max-height: 110px; order: 2; }
+  .play-area { order: 1; }
   .card { width: 84px; height: 118px; }
   .hand { gap: 8px; }
   .opponent { min-width: 72px; }

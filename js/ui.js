@@ -267,22 +267,35 @@ function renderHeader() {
 function renderOpponents() {
   const wrap = $('#opponents');
   wrap.innerHTML = '';
+  const nextIdx = game.nextPlayerIdx();
   game.players.forEach((p, i) => {
     if (i === viewerIdx()) return;
     const div = document.createElement('div');
     div.className = 'opponent';
     if (i === game.currentIdx) div.classList.add('current');
+    else if (i === nextIdx) div.classList.add('next');
     if (p.eliminated) div.classList.add('eliminated');
     if (p.protected) div.classList.add('protected');
     div.dataset.idx = i;
+
+    // Turn badge
+    if (i === game.currentIdx) {
+      const badge = document.createElement('div'); badge.className = 'turn-badge'; badge.textContent = '● Tour';
+      div.appendChild(badge);
+    } else if (i === nextIdx) {
+      const badge = document.createElement('div'); badge.className = 'turn-badge'; badge.textContent = 'Suivant';
+      div.appendChild(badge);
+    }
+
+    // Token count
+    const tok = document.createElement('div'); tok.className = 'token-count'; tok.textContent = p.tokens;
+    div.appendChild(tok);
 
     const name = document.createElement('div'); name.className = 'opp-name'; name.textContent = p.name;
     const hand = document.createElement('div'); hand.className = 'opp-hand';
     p.hand.forEach(() => {
       const cb = document.createElement('div'); cb.className = 'card-back'; hand.appendChild(cb);
     });
-    const toks = document.createElement('div'); toks.className = 'opp-tokens';
-    toks.textContent = '💝'.repeat(p.tokens) || '—';
     const disc = document.createElement('div'); disc.className = 'opp-discard';
     p.discard.slice(-6).forEach(c => {
       const m = document.createElement('div'); m.className = 'mini-card'; m.textContent = c.value; m.title = c.name;
@@ -291,7 +304,6 @@ function renderOpponents() {
 
     div.appendChild(name);
     div.appendChild(hand);
-    div.appendChild(toks);
     div.appendChild(disc);
     wrap.appendChild(div);
   });
@@ -309,8 +321,17 @@ function renderPlayArea() {
 
 function renderHand() {
   const me = game.players[viewerIdx()];
-  $('#current-name').textContent = me.name;
-  $('#current-tokens').textContent = '💝'.repeat(me.tokens);
+  const nextIdx = game.nextPlayerIdx();
+  const myTurn = game.currentIdx === viewerIdx();
+  const mySuivant = viewerIdx() === nextIdx;
+  const cp = $('#current-player');
+  cp.classList.toggle('my-turn', myTurn);
+  cp.classList.toggle('my-next', mySuivant && !myTurn);
+  let label = me.name;
+  if (myTurn) label = '● À TOI · ' + me.name;
+  else if (mySuivant) label = 'Tu joues après · ' + me.name;
+  $('#current-name').textContent = label;
+  $('#current-tokens').textContent = '💝 ' + me.tokens;
   const hand = $('#hand');
   hand.innerHTML = '';
   const isMyTurn = game.currentIdx === viewerIdx() && !me.eliminated && game.phase === 'round' && (!online || localSeat === viewerIdx());
@@ -329,7 +350,7 @@ function renderHand() {
 
 function renderLog() {
   const wrap = $('#log');
-  wrap.innerHTML = '';
+  wrap.innerHTML = '<div class="log-header">Journal de la partie</div>';
   game.log.slice(-40).forEach(entry => {
     const div = document.createElement('div');
     div.className = 'log-entry ' + (entry.cls || '');

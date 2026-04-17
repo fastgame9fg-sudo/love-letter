@@ -155,6 +155,7 @@ export class Game {
       // Premium
       case 'jester': this.effectJester(intent, player); break;
       case 'assassin': this.pushLog(`${player.name} défausse l'Assassin (aucun effet direct)`); break;
+      case 'spy': this.pushLog(`${player.name} défausse l'Espionne`); break;
       case 'cardinal': this.effectCardinal(intent, player); break;
       case 'baroness': this.effectBaroness(intent, player); break;
       case 'sycophant': this.effectSycophant(intent, player); break;
@@ -395,6 +396,15 @@ export class Game {
         this.pushLog(`<b>${this.players[bet.bettor].name}</b> remporte son pari Bouffon +1`, 'highlight');
       }
     }
+    // Spy: only player with >=1 spy in discard gains 1 token
+    const spyOwners = this.players
+      .map((p, i) => ({ p, i, n: p.discard.filter(c => c.id === 'spy').length }))
+      .filter(x => x.n > 0);
+    if (spyOwners.length === 1) {
+      const s = spyOwners[0];
+      s.p.tokens++;
+      this.pushLog(`<b>${s.p.name}</b> gagne 1 jeton (seule Espionne)`, 'highlight');
+    }
     this.lastStartWinner = winnerIdxs[0];
     // Check match end
     const winner = this.players.find(p => p.tokens >= this.tokensToWin);
@@ -411,6 +421,16 @@ export class Game {
   }
 
   currentPlayer() { return this.players[this.currentIdx]; }
+
+  nextPlayerIdx() {
+    if (this.phase !== 'round') return null;
+    const n = this.players.length;
+    for (let k = 1; k <= n; k++) {
+      const idx = (this.currentIdx + k) % n;
+      if (!this.players[idx].eliminated) return idx;
+    }
+    return null;
+  }
   pushLog(text, cls = '') { this.log.push({ text, cls, round: this.round }); }
 
   // Helpers for UI
