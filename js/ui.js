@@ -140,6 +140,11 @@ function nextAction() {
   }
 }
 
+export function applyRemoteDraw() {
+  game.drawCard();
+  renderAll();
+}
+
 let lastShownSeat = -1;
 function shouldShowPass() {
   const humans = game.players.filter(p => !p.isBot && !p.eliminated);
@@ -163,9 +168,19 @@ function closePassScreen() {
 }
 
 function runBotTurn() {
+  // Bots draw first if needed
+  if (game.awaitingDraw) {
+    if (online && online.isHost) {
+      online.sendDraw();
+    } else {
+      game.drawCard();
+    }
+    // Delay to visualize the draw, then play
+    setTimeout(() => runBotTurn(), 500);
+    return;
+  }
   const intent = aiChooseIntent(game);
   if (online && online.isHost) {
-    // Host broadcasts the bot intent (does not apply locally; handled via onIntent)
     online.sendIntent(intent);
     return;
   }
@@ -239,13 +254,22 @@ function showReveal(reveal) {
   $('#reveal-title').textContent = reveal.note || 'Révélation';
   const wrap = $('#reveal-cards');
   wrap.innerHTML = '';
-  for (const r of reveal.revealed) {
+  const isDuel = reveal.revealed.length === 2 && ['Duel Baron', 'Reine-mère'].includes(reveal.note);
+  reveal.revealed.forEach((r, i) => {
     const col = document.createElement('div');
-    col.style.textAlign = 'center';
-    col.innerHTML = `<div style="font-size:11px;color:var(--text-dim);margin-bottom:4px">${game.players[r.playerIdx].name}</div>`;
+    col.className = 'reveal-col';
+    const isMe = r.playerIdx === viewerIdx();
+    const label = isMe ? 'TA CARTE' : game.players[r.playerIdx].name;
+    col.innerHTML = `<div class="reveal-label${isMe ? ' me' : ''}">${label}</div>`;
     col.appendChild(renderCard(r.card, false));
     wrap.appendChild(col);
-  }
+    if (isDuel && i === 0) {
+      const vs = document.createElement('div');
+      vs.className = 'reveal-vs';
+      vs.textContent = 'VS';
+      wrap.appendChild(vs);
+    }
+  });
   ov.classList.remove('hidden');
   $('#reveal-ok').onclick = () => {
     ov.classList.add('hidden');
@@ -331,13 +355,31 @@ function renderHand() {
   cp.classList.toggle('my-turn', myTurn);
   cp.classList.toggle('my-next', mySuivant && !myTurn);
   let label = me.name;
-  if (myTurn) label = '● À TOI · ' + me.name;
+  if (myTurn && game.awaitingDraw) label = '● À TOI · pioche une carte';
+  else if (myTurn) label = '● À TOI · joue une carte';
   else if (mySuivant) label = 'Tu joues après · ' + me.name;
   $('#current-name').textContent = label;
   $('#current-tokens').textContent = '💝 ' + me.tokens;
   const hand = $('#hand');
   hand.innerHTML = '';
-  const isMyTurn = game.currentIdx === viewerIdx() && !me.eliminated && game.phase === 'round' && (!online || localSeat === viewerIdx());
+  const isMyTurn = myTurn && !me.eliminated && game.phase === 'round' && (!online || localSeat === viewerIdx());
+
+  // Show Pioche button if it's my turn and I haven't drawn yet
+  if (isMyTurn && game.awaitingDraw) {
+    const drawBtn = document.createElement('button');
+    drawBtn.className = 'draw-btn';
+    drawBtn.innerHTML = `<div class="draw-pile"><span>${game.deck.length}</span></div><div class="draw-label">Pioche</div>`;
+    drawBtn.addEventListener('click', () => onDrawClick());
+    hand.appendChild(drawBtn);
+    // Still render the 1 existing card as disabled
+    me.hand.forEach(card => {
+      const el = renderCard(card, false);
+      el.classList.add('disabled');
+      hand.appendChild(el);
+    });
+    return;
+  }
+
   const mustCountess = game.mustPlayCountess();
   me.hand.forEach(card => {
     const el = renderCard(card, false);
@@ -349,6 +391,15 @@ function renderHand() {
     });
     hand.appendChild(el);
   });
+}
+
+function onDrawClick() {
+  if (online) {
+    online.sendDraw();
+  } else {
+    game.drawCard();
+    renderAll();
+  }
 }
 
 function renderLog() {

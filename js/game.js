@@ -32,6 +32,7 @@ export class Game {
     this.jesterBets = []; // { bettor, target }
     this.lastStartWinner = 0;
     this.matchEnded = false;
+    this.awaitingDraw = false;
   }
 
   // ========== ROUND LIFECYCLE ==========
@@ -70,27 +71,31 @@ export class Game {
 
     // Set start player (previous round winner or initial)
     this.currentIdx = this.lastStartWinner % this.players.length;
-
-    // Draw for first player
-    this.drawForCurrent();
+    // First player must draw manually
+    this.awaitingDraw = true;
   }
 
-  drawForCurrent() {
+  drawCard() {
+    if (!this.awaitingDraw) return false;
     const p = this.players[this.currentIdx];
-    if (this.deck.length > 0) {
-      p.hand.push(this.deck.pop());
-    } else {
+    if (p.hand.length >= 2) { this.awaitingDraw = false; return false; }
+    if (this.deck.length === 0) {
       // deck empty → round ends immediately at comparison
       this.endRoundByDeck();
-      return;
+      return false;
     }
+    p.hand.push(this.deck.pop());
     p.protected = false;
+    this.awaitingDraw = false;
+    return true;
   }
 
   // ========== PLAY CARD ==========
   // intent: { cardUid, targetIdx?, guessCardId?, target2Idx?, jesterTargetIdx?, baronessTargets? (array 1 or 2), lookAtIdx? (for Cardinal) }
   playCard(intent) {
+    if (this.awaitingDraw) throw new Error('Tu dois piocher avant de jouer');
     const player = this.players[this.currentIdx];
+    if (player.hand.length !== 2) throw new Error(`Hand invalide: ${player.hand.length} carte(s)`);
     const idx = player.hand.findIndex(c => c.uid === intent.cardUid);
     if (idx === -1) throw new Error('Card not in hand');
 
@@ -365,7 +370,7 @@ export class Game {
     do {
       this.currentIdx = (this.currentIdx + 1) % this.players.length;
     } while (this.players[this.currentIdx].eliminated);
-    this.drawForCurrent();
+    this.awaitingDraw = true;
   }
 
   endRoundByElimination(winnerIdx) {

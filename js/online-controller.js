@@ -31,6 +31,8 @@ export class HostController {
           this.broadcastAction(data.intent);
         } else if (data.type === 'bishopAccept') {
           this.broadcastBishop(data.accept);
+        } else if (data.type === 'drawRequest') {
+          this.broadcastDraw();
         }
       },
       onDisconnect: () => {
@@ -87,9 +89,15 @@ export class HostController {
     this.onNextRound && this.onNextRound();
   }
 
+  broadcastDraw() {
+    this.server.broadcast({ type: 'draw' });
+    this.onDraw && this.onDraw();
+  }
+
   sendIntent(intent) { this.broadcastAction(intent); }
   sendBishop(accept) { this.broadcastBishop(accept); }
   sendNextRound() { this.broadcastNextRound(); }
+  sendDraw() { this.broadcastDraw(); }
   close() { this.server?.close(); }
 }
 
@@ -120,6 +128,8 @@ export class GuestController {
           this.onBishopAccept && this.onBishopAccept(data.accept);
         } else if (data.type === 'nextRound') {
           this.onNextRound && this.onNextRound();
+        } else if (data.type === 'draw') {
+          this.onDraw && this.onDraw();
         } else if (data.type === 'lobby') {
           this.onLobbyUpdate && this.onLobbyUpdate(data);
         }
@@ -131,5 +141,6 @@ export class GuestController {
 
   sendIntent(intent) { this.client.send({ type: 'intent', intent }); }
   sendBishop(accept) { this.client.send({ type: 'bishopAccept', accept }); }
+  sendDraw() { this.client.send({ type: 'drawRequest' }); }
   close() { this.client?.close(); }
 }
