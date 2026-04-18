@@ -104,9 +104,14 @@ export function applyRemoteIntent(intent) {
   if (game.awaitingDraw) {
     game.drawCard();
   }
+  // Look up the card about to be played (from the current player's hand) to
+  // trigger the cinematic BEFORE the state mutation moves it to discard.
+  const actor = game.currentPlayer();
+  const cardBeingPlayed = actor?.hand.find(c => c.uid === intent.cardUid);
   try { game.playCard(intent); }
   catch (e) { console.error('applyRemoteIntent failed', e); return; }
-  handleAfterPlay();
+  if (cardBeingPlayed) playCinematic(cardBeingPlayed, () => handleAfterPlay());
+  else handleAfterPlay();
 }
 export function applyRemoteBishop(accept) {
   game.bishopDiscardChoice(accept);
@@ -192,12 +197,15 @@ function runBotTurn() {
     online.sendIntent(intent);
     return;
   }
+  const actor = game.currentPlayer();
+  const card = actor?.hand.find(c => c.uid === intent.cardUid);
   try {
     game.playCard(intent);
   } catch (e) {
     console.error(e);
   }
-  handleAfterPlay();
+  if (card) playCinematic(card, () => handleAfterPlay());
+  else handleAfterPlay();
 }
 
 function handleAfterPlay() {
@@ -471,6 +479,65 @@ function viewerIdx() {
   return h >= 0 ? h : 0;
 }
 
+// ===== Cinematic card play =====
+let cinematicActive = false;
+function playCinematic(card, onDone) {
+  if (cinematicActive) { onDone && onDone(); return; }
+  cinematicActive = true;
+  const overlay = document.createElement('div');
+  overlay.className = 'play-cinematic';
+
+  const stage = document.createElement('div');
+  stage.className = 'cine-stage';
+
+  // Main card element
+  const cardEl = document.createElement('div');
+  cardEl.className = 'cine-card';
+  const bg = card.img ? `<div class="portrait-frame" style="background-image:url('${card.img}')"></div>` : '';
+  cardEl.innerHTML = `
+    <div class="value">${card.value}</div>
+    <div class="name" dir="auto">${cardName(card, game?.mode || 'classic')}</div>
+    ${bg}
+    <div class="cine-desc">${card.desc}</div>
+  `;
+  stage.appendChild(cardEl);
+
+  // Character "emerging" layer — same illustration but larger & floating above
+  if (card.img) {
+    const emerge = document.createElement('div');
+    emerge.className = 'cine-emerge';
+    emerge.style.backgroundImage = `url('${card.img}')`;
+    stage.appendChild(emerge);
+  }
+
+  // Particle sparks
+  const sparks = document.createElement('div');
+  sparks.className = 'cine-sparks';
+  for (let i = 0; i < 14; i++) {
+    const s = document.createElement('span');
+    const angle = (Math.PI * 2 * i) / 14 + (Math.random() - 0.5) * 0.3;
+    const dist = 160 + Math.random() * 100;
+    s.style.setProperty('--dx', Math.cos(angle) * dist + 'px');
+    s.style.setProperty('--dy', Math.sin(angle) * dist - 40 + 'px');
+    s.style.animationDelay = (i * 30) + 'ms';
+    sparks.appendChild(s);
+  }
+  stage.appendChild(sparks);
+
+  overlay.appendChild(stage);
+  document.body.appendChild(overlay);
+
+  const holdMs = 1100;
+  setTimeout(() => {
+    overlay.classList.add('exiting');
+    setTimeout(() => {
+      overlay.remove();
+      cinematicActive = false;
+      onDone && onDone();
+    }, 350);
+  }, holdMs);
+}
+
 function renderCard(card, compact) {
   const el = document.createElement('div');
   el.className = 'card' + (compact ? ' played-card' : '') + (card.img ? ' has-img' : '');
@@ -623,6 +690,8 @@ function playIntent(intent) {
     online.sendIntent(intent);
     return;
   }
+  const actor = game.currentPlayer();
+  const card = actor?.hand.find(c => c.uid === intent.cardUid);
   try {
     game.playCard(intent);
   } catch (e) {
@@ -630,7 +699,8 @@ function playIntent(intent) {
     renderAll();
     return;
   }
-  handleAfterPlay();
+  if (card) playCinematic(card, () => handleAfterPlay());
+  else handleAfterPlay();
 }
 
 // ===== END SCREENS =====
